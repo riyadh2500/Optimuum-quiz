@@ -1,5 +1,4 @@
 import { auth } from "@clerk/nextjs/server";
-import { error } from "console";
 import React from "react";
 import prisma from "@/utils/connect";
 import UserStats from "@/components/UserStats";
@@ -10,10 +9,14 @@ async function page() {
   const { userId } = await auth();
 
   if (!userId) {
-    return { error: "You need to be logged in to view this page" };
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-lg font-semibold text-gray-500">
+          You need to be logged in to view this page.
+        </p>
+      </div>
+    );
   }
-
-  // get user data --> populate the categoryStats using the category
 
   const user = await prisma.user.findUnique({
     where: {
@@ -22,13 +25,11 @@ async function page() {
     include: {
       categoryStats: {
         include: {
-          category: true, // populate the category
+          category: true,
         },
       },
     },
   });
-
-  console.log("User stats:", user);
 
   return (
     <div>
